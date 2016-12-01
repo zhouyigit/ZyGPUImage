@@ -43,7 +43,7 @@
 #import "GPUImageKuwaharaFilter.h"
 #import "GPUImageKuwaharaRadius3Filter.h"
 #import "GPUImageVignetteFilter.h"
-#import "GPUImageGaussianBlurFilter.h"
+#import "GPUImageGaussianBlurFilter.h"                                      //高斯模糊
 #import "GPUImageGaussianBlurPositionFilter.h"
 #import "GPUImageGaussianSelectiveBlurFilter.h"
 #import "GPUImageOverlayBlendFilter.h"
