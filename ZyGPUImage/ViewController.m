@@ -45,22 +45,26 @@
     self.imageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:self.imageView];
 
-    /*
-     *开源代码 欢迎贡献 请按照下面格式添加功能 （旨在让大家看到各种滤镜效果）
-     *1.titles数组中添加滤镜名称
-     *2.初始化switch中设置范围和默认值（范围值可进入相应.h文件中查看）
-     *3.路由switch中调用滤镜方法
-     *4.在GPUImage.h中进行标注
-     */
     _titles = [NSMutableArray arrayWithCapacity:0];
     
     [self resetDemo];
     
 }
 
+/*
+ *看我！！！
+ *看我！！！
+ *看我！！！
+ *开源代码 欢迎贡献 请按照下面格式添加功能 （旨在让大家看到各种滤镜效果）
+ *1.在重置方法resetDemo中 为_titles数组添加滤镜名称 并 设置该滤镜的范围和默认值（范围值可进入相应.h文件中查看，没有范围的就自定义吧）
+ *2.在路由方法sliderChanged中调用滤镜方法
+ *3.在GPUImage.h中进行标注，以纪录您的贡献
+ */
+
 #pragma mark 重置
 -(void)resetDemo {
     
+    [_titles removeAllObjects];
     self.index = -1;
     self.image = [UIImage imageNamed:@"image.jpg"];
     self.imageView.image = self.image;
@@ -75,8 +79,9 @@
     [button setTitle:@"重置" forState:UIControlStateNormal];
     [_scrollView addSubview:button];
     
-    //为了滤镜名称和范围值写在一起，所以for循环次数粗暴的写死了
-    for (int i=0; i<4; i++) {
+#pragma mark 为了滤镜名称和范围值写在一起，所以for循环次数粗暴的写死了
+    int sliderCount = 5;
+    for (int i=0; i<sliderCount; i++) {
         
         ZYSlider *slider = [[ZYSlider alloc] initWithFrame:CGRectMake(0, 20+44+44*i, WIDTH, 44)];
         [_scrollView addSubview:slider];
@@ -101,12 +106,21 @@
                 slider.minimumValue = 0.0f;
                 slider.maximumValue = 4.0f;
                 slider.value = 1.0f;
+                break;
                 
             case 3:
                 [_titles addObject:@"高斯模糊"];
                 slider.minimumValue = 0.0f;
                 slider.maximumValue = 10.0f;
                 slider.value = 1.0f;
+                break;
+                
+            case 4:
+                [_titles addObject:@"素描"];
+                slider.minimumValue = 0.0f;
+                slider.maximumValue = 10.0f;
+                slider.value = 1.0f;
+                break;
                 
             default:
                 break;
@@ -119,10 +133,16 @@
     }
     
     _scrollView.contentSize = CGSizeMake(0, 20+44+44*_titles.count+HEIGHT);//可以把滑块滚上去看效果
+    
+    if (sliderCount != (int)_titles.count) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"爱心提醒" message:@"for循环次数sliderCount未设置" delegate:nil cancelButtonTitle:@"哦" otherButtonTitles:nil, nil];
+        [alert show];
+    }
 }
 
 #pragma mark 路由方法 用于调用slider对应的滤镜
 -(void)sliderChanged:(id)sender {
+    
     ZYSlider *slider = (ZYSlider*)sender;
     slider.text = slider.value;
     [self updateSourceImageForIndex:slider.index];
@@ -146,24 +166,32 @@
             filter = [self changeGaussianBlur:slider];//高斯模糊
             break;
             
+            //            case 4:
+            //                filter = [self changeSketch:slider];//素描
+            
         default:
             break;
     }
     
-    //设置渲染区域
-    [filter forceProcessingAtSize:_image.size];
-    [filter useNextFrameForImageCapture];
-    //获取数据源
-    GPUImagePicture *picture = [[GPUImagePicture alloc] initWithImage:_image];
-    //添加滤镜
-    [picture addTarget:filter];
-    //开始渲染
-    [picture processImage];
-    //获取渲染后的图片
-    UIImage *gpuImage = [filter imageFromCurrentFramebuffer];
-    
-    self.imageView.image = gpuImage;
-    
+    if (filter == nil) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"爱心提醒" message:@"路由方法未设置filter" delegate:self cancelButtonTitle:@"哦" otherButtonTitles:nil, nil];
+        [alert show];
+    } else {
+        
+        //设置渲染区域
+        [filter forceProcessingAtSize:_image.size];
+        [filter useNextFrameForImageCapture];
+        //获取数据源
+        GPUImagePicture *picture = [[GPUImagePicture alloc] initWithImage:_image];
+        //添加滤镜
+        [picture addTarget:filter];
+        //开始渲染
+        [picture processImage];
+        //获取渲染后的图片
+        UIImage *gpuImage = [filter imageFromCurrentFramebuffer];
+        
+        self.imageView.image = gpuImage;
+    }
 }
 
 #pragma mark 切换滤镜时 保存当前图片 在当前图片的基础上 新增滤镜效果
@@ -211,5 +239,12 @@
     return filter;
 }
 
+#pragma mark 素描
+-(GPUImageFilter*)changeSketch:(ZYSlider*)slider {
+    GPUImageSketchFilter *filter = [[GPUImageSketchFilter alloc] init];
+    filter.edgeStrength = slider.value;
+    return filter;
+    //素描继承自其父类的默认值
+}
 
 @end
