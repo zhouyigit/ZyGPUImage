@@ -1,5 +1,5 @@
 #import "GLProgram.h"
-
+/*开源代码 欢迎贡献 请在你添加的滤镜功能后面标注功能和作者 例如 #import "GPUImageBrightnessFilter.h" //亮度--zhouyigit */
 // Base classes
 #import "GPUImageContext.h"
 #import "GPUImageOutput.h"
@@ -28,9 +28,9 @@
 #import "GPUImageSepiaFilter.h"
 #import "GPUImageColorInvertFilter.h"
 #import "GPUImageSaturationFilter.h"
-#import "GPUImageContrastFilter.h"
-#import "GPUImageExposureFilter.h"
-#import "GPUImageBrightnessFilter.h"
+#import "GPUImageContrastFilter.h"                                          //对比度--ZyGit
+#import "GPUImageExposureFilter.h"                                          //曝光--ZyGit
+#import "GPUImageBrightnessFilter.h"                                        //亮度--ZyGit
 #import "GPUImageLevelsFilter.h"
 #import "GPUImageSharpenFilter.h"
 #import "GPUImageGammaFilter.h"
