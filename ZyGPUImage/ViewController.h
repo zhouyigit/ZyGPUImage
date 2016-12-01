@@ -14,6 +14,10 @@
 #define HEIGHT [UIScreen mainScreen].bounds.size.height
 
 @interface ViewController : UIViewController
+{
+    NSMutableArray *_titles;
+    UIScrollView *_scrollView;
+}
 
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) UIImageView *imageView;

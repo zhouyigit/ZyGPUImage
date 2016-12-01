@@ -41,58 +41,84 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.image = [UIImage imageNamed:@"image.jpg"];
-    self.index = -1;
-    
+
     self.imageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
-    self.imageView.image = self.image;
     [self.view addSubview:self.imageView];
-    
-    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-    scrollView.contentSize = CGSizeMake(0, HEIGHT*2);
-    [self.view addSubview:scrollView];
-    
+
     /*
-     *开源代码 欢迎贡献 请按照下面格式添加功能
+     *开源代码 欢迎贡献 请按照下面格式添加功能 （旨在让大家看到各种滤镜效果）
      *1.titles数组中添加滤镜名称
-     *2.初始化switch中设置范围（范围值可进入相应.h文件中查看）
+     *2.初始化switch中设置范围和默认值（范围值可进入相应.h文件中查看）
      *3.路由switch中调用滤镜方法
      *4.在GPUImage.h中进行标注
      */
-    NSArray *titles = [NSArray arrayWithObjects:@"高亮",@"曝光",@"对比度", nil];
+    _titles = [NSMutableArray arrayWithCapacity:0];
     
-    for (int i=0; i<titles.count; i++) {
+    [self resetDemo];
+    
+}
+
+#pragma mark 重置
+-(void)resetDemo {
+    
+    self.index = -1;
+    self.image = [UIImage imageNamed:@"image.jpg"];
+    self.imageView.image = self.image;
+    
+    [_scrollView removeFromSuperview];
+    _scrollView = nil;
+    _scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:_scrollView];
+    
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 20+0, WIDTH, 44)];
+    [button addTarget:self action:@selector(resetDemo) forControlEvents:UIControlEventTouchUpInside];
+    [button setTitle:@"重置" forState:UIControlStateNormal];
+    [_scrollView addSubview:button];
+    
+    //为了滤镜名称和范围值写在一起，所以for循环次数粗暴的写死了
+    for (int i=0; i<4; i++) {
         
-        ZYSlider *slider = [[ZYSlider alloc] initWithFrame:CGRectMake(0, 20+44*i, WIDTH, 44)];
-        [scrollView addSubview:slider];
-        slider.index = i;
-        slider.title = [titles objectAtIndex:i];
+        ZYSlider *slider = [[ZYSlider alloc] initWithFrame:CGRectMake(0, 20+44+44*i, WIDTH, 44)];
+        [_scrollView addSubview:slider];
         
         switch (i) {
             case 0:
+                [_titles addObject:@"高亮"];
                 slider.minimumValue = -1.0f;
                 slider.maximumValue = 1.0f;
                 slider.value = 0.0f;
                 break;
                 
             case 1:
+                [_titles addObject:@"曝光"];
                 slider.minimumValue = -10.0f;
                 slider.maximumValue = 10.0f;
                 slider.value = 0.0f;
                 break;
                 
             case 2:
+                [_titles addObject:@"对比度"];
                 slider.minimumValue = 0.0f;
                 slider.maximumValue = 4.0f;
                 slider.value = 1.0f;
+                
+            case 3:
+                [_titles addObject:@"高斯模糊"];
+                slider.minimumValue = 0.0f;
+                slider.maximumValue = 10.0f;
+                slider.value = 1.0f;
+                
             default:
                 break;
         }
         
+        slider.index = i;
+        slider.title = [_titles objectAtIndex:i];
         [slider addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
         
     }
     
+    _scrollView.contentSize = CGSizeMake(0, 20+44+44*_titles.count+HEIGHT);//可以把滑块滚上去看效果
 }
 
 #pragma mark 路由方法 用于调用slider对应的滤镜
@@ -114,6 +140,10 @@
             
         case 2:
             filter = [self changeContrast:slider];//对比度
+            break;
+            
+        case 3:
+            filter = [self changeGaussianBlur:slider];//高斯模糊
             break;
             
         default:
@@ -174,7 +204,12 @@
     return filter;
 }
 
-
+#pragma mark 高斯模糊
+-(GPUImageFilter*)changeGaussianBlur:(ZYSlider*)slider {
+    GPUImageGaussianBlurFilter *filter = [[GPUImageGaussianBlurFilter alloc] init];
+    filter.texelSpacingMultiplier = slider.value;
+    return filter;
+}
 
 
 @end
