@@ -19,7 +19,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark 渲染流程示例 仅仅用于让读者明白单个滤镜的渲染流程
+#pragma mark 渲染流程示例 仅仅用于让读者明白单个滤镜的渲染流程 无用方法
 -(void)example {
     //创建一个高亮滤镜
     GPUImageBrightnessFilter *filter = [[GPUImageBrightnessFilter alloc] init];
@@ -41,6 +41,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    _originalImage = [UIImage imageNamed:@"image.jpg"];
 
     self.imageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:self.imageView];
@@ -49,6 +51,55 @@
     
     [self resetDemo];
     
+
+}
+
+#pragma mark 调用相册
+-(void)getAlbum {
+    _picker = [[UIImagePickerController alloc] init];
+    _picker.delegate = self;
+    _picker.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    _picker.allowsEditing = YES;
+    _picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    [self presentViewController:_picker animated:YES completion:^{
+        //
+    }];
+}
+
+#pragma mark 相册回调
+-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+
+    NSLog(@"%@",info);
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    if ([mediaType isEqualToString:@"public.image"]) {
+        _originalImage = info[UIImagePickerControllerOriginalImage];
+        [self resetDemo];
+    }
+    [self dismissViewControllerAnimated:YES completion:^{
+        _picker.delegate = nil;
+        _picker = nil;
+    }];
+}
+
+#pragma mark 相册取消
+-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [self dismissViewControllerAnimated:YES completion:^{
+        _picker.delegate = nil;
+        _picker = nil;
+    }];
+}
+
+#pragma mark 保存图片
+-(void)saveImage {
+    UIImageWriteToSavedPhotosAlbum(_imageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+}
+
+#pragma mark 图片保存完毕的回调
+- (void) image: (UIImage *) image didFinishSavingWithError:(NSError *) error contextInfo: (void *)contextInf{
+    if (!error) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"保存成功" message:nil delegate:nil cancelButtonTitle:@"哦" otherButtonTitles:nil, nil];
+        [alert show];
+    }
 }
 
 /*
@@ -66,7 +117,7 @@
     
     [_titles removeAllObjects];
     self.index = -1;
-    self.image = [UIImage imageNamed:@"image.jpg"];
+    self.image = _originalImage;
     self.imageView.image = self.image;
     
     [_scrollView removeFromSuperview];
@@ -74,24 +125,39 @@
     _scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:_scrollView];
     
-    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 20+0, WIDTH, 44)];
-    [button addTarget:self action:@selector(resetDemo) forControlEvents:UIControlEventTouchUpInside];
-    [button setTitle:@"重置" forState:UIControlStateNormal];
-    [_scrollView addSubview:button];
+    float buttonCount = 4.0;
+    float width = WIDTH/buttonCount;
+    float height = 44.0;
     
-#pragma mark 为了滤镜名称和范围值写在一起，所以for循环次数粗暴的写死了
-    int sliderCount = 5;
-    for (int i=0; i<sliderCount; i++) {
+    UIButton *buttonAlbum = [[UIButton alloc] initWithFrame:CGRectMake(width*0, 20, width, height)];
+    [buttonAlbum addTarget:self action:@selector(getAlbum) forControlEvents:UIControlEventTouchUpInside];
+    [buttonAlbum setTitle:@"相册" forState:UIControlStateNormal];
+    [_scrollView addSubview:buttonAlbum];
+    
+    UIButton *buttonSave = [[UIButton alloc] initWithFrame:CGRectMake(width*2, 20, width, height)];
+    [buttonSave addTarget:self action:@selector(saveImage) forControlEvents:UIControlEventTouchUpInside];
+    [buttonSave setTitle:@"保存" forState:UIControlStateNormal];
+    [_scrollView addSubview:buttonSave];
+    
+    UIButton *buttonReset = [[UIButton alloc] initWithFrame:CGRectMake(width*3, 20, width, height)];
+    [buttonReset addTarget:self action:@selector(resetDemo) forControlEvents:UIControlEventTouchUpInside];
+    [buttonReset setTitle:@"重置" forState:UIControlStateNormal];
+    [_scrollView addSubview:buttonReset];
+    
+    
+#pragma mark 为了滤镜名称和范围值写在一起，所以
+    int sliderIndex = 0;
+    BOOL hasMore = YES;
+    do {
         
-        ZYSlider *slider = [[ZYSlider alloc] initWithFrame:CGRectMake(0, 20+44+44*i, WIDTH, 44)];
-        [_scrollView addSubview:slider];
+        ZYSlider *slider = [[ZYSlider alloc] initWithFrame:CGRectMake(0, 20+height+height*sliderIndex, WIDTH, height)];
         
-        switch (i) {
+        switch (sliderIndex) {
             case 0:
                 [_titles addObject:@"高亮"];
-                slider.minimumValue = -1.0f;
-                slider.maximumValue = 1.0f;
-                slider.value = 0.0f;
+                slider.minimumValue = -1.0f;//滤镜最小值
+                slider.maximumValue = 1.0f;//滤镜最大值
+                slider.value = 0.0f;//滤镜默认值
                 break;
                 
             case 1:
@@ -123,21 +189,25 @@
                 break;
                 
             default:
+                hasMore = NO;
                 break;
         }
         
-        slider.index = i;
-        slider.title = [_titles objectAtIndex:i];
-        [slider addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
+        if (hasMore == NO) {
+            slider = nil;
+            break;
+        } else {
+            slider.index = sliderIndex;
+            slider.title = [_titles objectAtIndex:sliderIndex];
+            [slider addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
+            [_scrollView addSubview:slider];
+            sliderIndex++;
+        }
         
-    }
+    } while (YES);
     
-    _scrollView.contentSize = CGSizeMake(0, 20+44+44*_titles.count+HEIGHT);//可以把滑块滚上去看效果
+    _scrollView.contentSize = CGSizeMake(0, 20+height+height*_titles.count+HEIGHT);//可以把滑块滚上去看效果
     
-    if (sliderCount != (int)_titles.count) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"爱心提醒" message:@"for循环次数sliderCount未设置" delegate:nil cancelButtonTitle:@"哦" otherButtonTitles:nil, nil];
-        [alert show];
-    }
 }
 
 #pragma mark 路由方法 用于调用slider对应的滤镜
@@ -166,8 +236,8 @@
             filter = [self changeGaussianBlur:slider];//高斯模糊
             break;
             
-            //            case 4:
-            //                filter = [self changeSketch:slider];//素描
+        case 4:
+            filter = [self changeSketch:slider];//素描
             
         default:
             break;
@@ -244,7 +314,7 @@
     GPUImageSketchFilter *filter = [[GPUImageSketchFilter alloc] init];
     filter.edgeStrength = slider.value;
     return filter;
-    //素描继承自其父类的默认值
+    //素描继承自其父类的默认值 设置1.0即可，实际是其父类效果
 }
 
 @end

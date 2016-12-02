@@ -25,6 +25,7 @@
 		654FBBBD1DE44A3300D8208A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654FBBBC1DE44A3300D8208A /* AVFoundation.framework */; };
 		654FBBBF1DE44A3C00D8208A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654FBBBE1DE44A3C00D8208A /* QuartzCore.framework */; };
 		654FBBC11DE44AF900D8208A /* image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 654FBBC01DE44AF900D8208A /* image.jpg */; };
+		658A2C271DF1123000C0194E /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 658A2C261DF1123000C0194E /* README.md */; };
 		65E8B1321DE587CC00EDEB3A /* ZYSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E8B1311DE587CC00EDEB3A /* ZYSlider.m */; };
 /* End PBXBuildFile section */
 
@@ -244,6 +245,7 @@
 		654FBBBC1DE44A3300D8208A /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		654FBBBE1DE44A3C00D8208A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		654FBBC01DE44AF900D8208A /* image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = image.jpg; sourceTree = "<group>"; };
+		658A2C261DF1123000C0194E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		65E8B1301DE587CC00EDEB3A /* ZYSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYSlider.h; sourceTree = "<group>"; };
 		65E8B1311DE587CC00EDEB3A /* ZYSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYSlider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -285,6 +287,7 @@
 		654FBAC01DE43C5000D8208A = {
 			isa = PBXGroup;
 			children = (
+				658A2C261DF1123000C0194E /* README.md */,
 				654FBBC01DE44AF900D8208A /* image.jpg */,
 				654FBAFF1DE448C000D8208A /* GPUImage */,
 				654FBACB1DE43C5000D8208A /* ZyGPUImage */,
@@ -689,6 +692,7 @@
 			files = (
 				654FBAD41DE43C5000D8208A /* ViewController.m in Sources */,
 				654FBAD11DE43C5000D8208A /* AppDelegate.m in Sources */,
+				658A2C271DF1123000C0194E /* README.md in Sources */,
 				654FBACE1DE43C5000D8208A /* main.m in Sources */,
 				65E8B1321DE587CC00EDEB3A /* ZYSlider.m in Sources */,
 			);
